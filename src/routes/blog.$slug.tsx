@@ -50,13 +50,13 @@ export const Route = createFileRoute("/blog/$slug")({
 
     const jsonLd: Record<string, unknown>[] = [
       {
-        "@context": "https://schema.org",
-        "@type": "Article",
+"@context": "https://schema.org",
+"@type": "Article",
         headline: post.title,
         description,
         image: post.featured_image ? [post.featured_image] : undefined,
         author: {
-          "@type": post.author_name ? "Person" : "Organization",
+"@type": post.author_name ? "Person" : "Organization",
           name: post.author_name || "Free Online Video Downloader",
         },
         publisher: { "@type": "Organization", name: "Free Online Video Downloader" },
@@ -65,8 +65,8 @@ export const Route = createFileRoute("/blog/$slug")({
         mainEntityOfPage: url,
       },
       {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
+"@context": "https://schema.org",
+"@type": "BreadcrumbList",
         itemListElement: [
           { "@type": "ListItem", position: 1, name: "Home", item: SITE },
           { "@type": "ListItem", position: 2, name: "Blog", item: `${SITE}/blog` },

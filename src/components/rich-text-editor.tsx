@@ -179,7 +179,7 @@ export function RichTextEditor({ value, onChange, onImageUpload }: Props) {
       title={title}
       onMouseDown={(e) => e.preventDefault()}
       onClick={onClick}
-      className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+      className="inline-flex h-9 w-9 items-center justify-center rounded-2xl text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
     >
       {children}
     </button>
@@ -200,7 +200,7 @@ export function RichTextEditor({ value, onChange, onImageUpload }: Props) {
         e.preventDefault();
         saveSel();
       }}
-      className="relative inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+      className="relative inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-2xl text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
     >
       {icon}
       <input
@@ -226,7 +226,7 @@ export function RichTextEditor({ value, onChange, onImageUpload }: Props) {
             type="button"
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => setBlockOpen((o) => !o)}
-            className="inline-flex h-9 items-center gap-1 rounded-lg px-2.5 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+            className="inline-flex h-9 items-center gap-1 rounded-2xl px-2.5 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
           >
             Format <ChevronDown className="h-3.5 w-3.5" />
           </button>
@@ -238,7 +238,7 @@ export function RichTextEditor({ value, onChange, onImageUpload }: Props) {
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => formatBlock(b.tag)}
-                  className="block w-full rounded-lg px-3 py-1.5 text-left text-sm text-foreground transition-colors hover:bg-secondary"
+                  className="block w-full rounded-2xl px-3 py-1.5 text-left text-sm text-foreground transition-colors hover:bg-secondary"
                 >
                   {b.label}
                 </button>

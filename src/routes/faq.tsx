@@ -5,7 +5,7 @@ export const Route = createFileRoute("/faq")({
   head: () => {
     const title = "FAQ — Free Online Video Downloader";
     const description =
-      "Answers to common questions about downloading videos and audio with Free Online Video Downloader: quality, cost, safety, supported platforms and more.";
+"Answers to common questions about downloading videos and audio with Free Online Video Downloader: quality, cost, safety, supported platforms and more.";
     return {
       meta: [
         { title },
@@ -19,10 +19,10 @@ export const Route = createFileRoute("/faq")({
         {
           type: "application/ld+json",
           children: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
+"@context": "https://schema.org",
+"@type": "FAQPage",
             mainEntity: faqs.map((f) => ({
-              "@type": "Question",
+"@type": "Question",
               name: f.q,
               acceptedAnswer: { "@type": "Answer", text: f.a },
             })),

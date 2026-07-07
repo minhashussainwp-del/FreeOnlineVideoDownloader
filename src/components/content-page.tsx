@@ -19,20 +19,19 @@ export function ContentPage({
     <div className="min-h-screen">
       <SiteHeader />
       <main>
-        <section className="relative overflow-hidden border-b border-border/60">
-          <div className="bg-grid absolute inset-0 opacity-40" />
-          <div className="absolute left-1/2 top-0 h-64 w-[720px] -translate-x-1/2 rounded-full bg-primary/15 blur-3xl" />
-          <div className="relative mx-auto max-w-3xl px-4 py-16 text-center sm:py-20">
+        <section className="relative overflow-hidden border-b border-border bg-hero">
+          <div className="bg-grid absolute inset-0 opacity-70" />
+          <div className="relative mx-auto max-w-3xl px-4 py-16 sm:py-20">
             {eyebrow && (
-              <p className="mb-4 text-sm font-semibold uppercase tracking-widest text-primary">
+              <p className="mb-5 inline-block rounded-xl border border-border bg-primary px-3 py-1 font-display text-xs font-extrabold uppercase tracking-[0.18em] text-primary-foreground shadow-soft">
                 {eyebrow}
               </p>
             )}
-            <h1 className="text-balance text-4xl font-bold sm:text-5xl">{title}</h1>
+            <h1 className="text-balance text-4xl font-extrabold leading-[1.02] sm:text-6xl">
+              {title}
+            </h1>
             {intro && (
-              <p className="mx-auto mt-5 max-w-xl text-balance text-muted-foreground">
-                {intro}
-              </p>
+              <p className="mt-6 max-w-xl text-balance text-lg text-muted-foreground">{intro}</p>
             )}
           </div>
         </section>
@@ -46,7 +45,7 @@ export function ContentPage({
 
 export function Prose({ children }: { children: ReactNode }) {
   return (
-    <div className="space-y-8 [&_a]:font-medium [&_a]:text-primary [&_a]:underline [&_h2]:text-2xl [&_h2]:font-bold [&_h3]:text-lg [&_h3]:font-bold [&_li]:text-muted-foreground [&_p]:leading-relaxed [&_p]:text-muted-foreground [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-5">
+    <div className="space-y-8 [&_a]:font-semibold [&_a]:text-primary [&_a]:underline [&_a]:decoration-2 [&_a]:underline-offset-2 [&_h2]:font-display [&_h2]:text-2xl [&_h2]:font-extrabold [&_h3]:text-lg [&_h3]:font-bold [&_li]:text-muted-foreground [&_p]:leading-relaxed [&_p]:text-muted-foreground [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-5">
       {children}
     </div>
   );
@@ -55,7 +54,10 @@ export function Prose({ children }: { children: ReactNode }) {
 export function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="space-y-3">
-      <h2>{title}</h2>
+      <h2 className="flex items-center gap-3">
+        <span className="inline-block h-4 w-4 shrink-0 rounded-sm border border-border bg-primary" />
+        {title}
+      </h2>
       {children}
     </div>
   );

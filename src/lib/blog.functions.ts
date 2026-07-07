@@ -57,6 +57,19 @@ export const getPublishedPostBySlug = createServerFn({ method: "GET" })
 export const ensureAdminAccess = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
+    // Primary check runs as the signed-in user (JWT). `has_role` is
+    // SECURITY DEFINER, so it reliably reports the caller's admin status
+    // without touching the service-role Data API (which can fail at runtime
+    // on new-format keys). Any existing admin gets in through this path.
+    const { data: alreadyAdmin, error: roleCheckErr } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (roleCheckErr) throw new Error(roleCheckErr.message);
+    if (alreadyAdmin) return { isAdmin: true, becameAdmin: false };
+
+    // Not an admin yet — only reach for the privileged client to decide
+    // whether this account may claim the one-time bootstrap admin role.
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { count, error } = await supabaseAdmin
@@ -65,46 +78,37 @@ export const ensureAdminAccess = createServerFn({ method: "POST" })
       .eq("role", "admin");
     if (error) throw new Error(error.message);
 
-    if (!count) {
-      // Bootstrap guard: never "first caller wins". Only a pre-approved,
-      // email-verified account may claim the initial admin role.
-      const approvedEmail = process.env.ADMIN_BOOTSTRAP_EMAIL?.trim().toLowerCase();
-      if (!approvedEmail) {
-        throw new Error("Admin bootstrap is not configured");
-      }
-
-      // Verify identity + email confirmation via the admin API (authoritative),
-      // not on JWT claim shape.
-      const { data: userRes, error: userErr } = await supabaseAdmin.auth.admin.getUserById(
-        context.userId,
-      );
-      if (userErr) throw new Error(userErr.message);
-
-      const callerEmail = userRes.user?.email?.trim().toLowerCase() ?? "";
-      const emailVerified = !!userRes.user?.email_confirmed_at;
-
-      if (!callerEmail || callerEmail !== approvedEmail || !emailVerified) {
-        return { isAdmin: false, becameAdmin: false };
-      }
-
-
-      const { error: insErr } = await supabaseAdmin
-        .from("user_roles")
-        .insert({ user_id: context.userId, role: "admin" });
-      if (insErr) throw new Error(insErr.message);
-      return { isAdmin: true, becameAdmin: true };
+    // An admin already exists and it isn't this user.
+    if (count && count > 0) {
+      return { isAdmin: false, becameAdmin: false };
     }
 
+    // Bootstrap guard: never "first caller wins". Only a pre-approved,
+    // email-verified account may claim the initial admin role.
+    const approvedEmail = process.env.ADMIN_BOOTSTRAP_EMAIL?.trim().toLowerCase();
+    if (!approvedEmail) {
+      throw new Error("Admin bootstrap is not configured");
+    }
 
-    const { data, error: roleErr } = await supabaseAdmin
+    // Verify identity + email confirmation via the admin API (authoritative),
+    // not on JWT claim shape.
+    const { data: userRes, error: userErr } = await supabaseAdmin.auth.admin.getUserById(
+      context.userId,
+    );
+    if (userErr) throw new Error(userErr.message);
+
+    const callerEmail = userRes.user?.email?.trim().toLowerCase() ?? "";
+    const emailVerified = !!userRes.user?.email_confirmed_at;
+
+    if (!callerEmail || callerEmail !== approvedEmail || !emailVerified) {
+      return { isAdmin: false, becameAdmin: false };
+    }
+
+    const { error: insErr } = await supabaseAdmin
       .from("user_roles")
-      .select("id")
-      .eq("user_id", context.userId)
-      .eq("role", "admin")
-      .maybeSingle();
-    if (roleErr) throw new Error(roleErr.message);
-
-    return { isAdmin: !!data, becameAdmin: false };
+      .insert({ user_id: context.userId, role: "admin" });
+    if (insErr) throw new Error(insErr.message);
+    return { isAdmin: true, becameAdmin: true };
   });
 
 // ---------- Admin reads ----------

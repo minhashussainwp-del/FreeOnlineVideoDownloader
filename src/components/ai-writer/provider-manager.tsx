@@ -126,7 +126,7 @@ export function ProviderManager() {
             </h3>
             <button
               onClick={() => setForm(null)}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-secondary"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-2xl text-muted-foreground hover:bg-secondary"
             >
               <X className="h-4 w-4" />
             </button>
@@ -270,7 +270,7 @@ export function ProviderManager() {
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => startEdit(p)}
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-secondary"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-2xl text-muted-foreground hover:bg-secondary"
                   aria-label="Edit"
                 >
                   <Pencil className="h-4 w-4" />
@@ -279,7 +279,7 @@ export function ProviderManager() {
                   onClick={() => {
                     if (confirm(`Delete provider "${p.name}"?`)) remove.mutate(p.id);
                   }}
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-destructive hover:bg-destructive/10"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-2xl text-destructive hover:bg-destructive/10"
                   aria-label="Delete"
                 >
                   <Trash2 className="h-4 w-4" />

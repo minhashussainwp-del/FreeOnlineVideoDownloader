@@ -6,7 +6,7 @@ export const Route = createFileRoute("/about")({
   head: () => {
     const title = "About Us — Free Online Video Downloader";
     const description =
-      "Free Online Video Downloader is a fast, free tool to download videos and audio from 11+ platforms with no sign-up. Learn who we are, what we value, and how it works.";
+"Free Online Video Downloader is a fast, free tool to download videos and audio from 11+ platforms with no sign-up. Learn who we are, what we value, and how it works.";
     return {
       meta: [
         { title },
@@ -20,12 +20,12 @@ export const Route = createFileRoute("/about")({
         {
           type: "application/ld+json",
           children: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Organization",
+"@context": "https://schema.org",
+"@type": "Organization",
             name: "Free Online Video Downloader",
             url: "https://freevideodownloader.lovable.app",
             description:
-              "A fast, free, browser-based tool to download public videos and audio from 11+ platforms with no sign-up.",
+"A fast, free, browser-based tool to download public videos and audio from 11+ platforms with no sign-up.",
           }),
         },
       ],

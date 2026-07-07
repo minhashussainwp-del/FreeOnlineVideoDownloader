@@ -5,7 +5,7 @@ export const Route = createFileRoute("/privacy")({
   head: () => {
     const title = "Privacy Policy — Free Online Video Downloader";
     const description =
-      "How Free Online Video Downloader handles your data when you use our free video downloader. This page is maintained by the Free Online Video Downloader team.";
+"How Free Online Video Downloader handles your data when you use our free video downloader. This page is maintained by the Free Online Video Downloader team.";
     return {
       meta: [
         { title },

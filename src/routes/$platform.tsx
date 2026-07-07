@@ -1,5 +1,5 @@
 import { createFileRoute, notFound, Link } from "@tanstack/react-router";
-import { ShieldCheck, Zap, Gift, ClipboardPaste, MousePointerClick, Download } from "lucide-react";
+import { ShieldCheck, Zap, ClipboardPaste, MousePointerClick, Download, Link2, Globe, MonitorSmartphone, FileVideo, BadgeCheck, Lock, Music, Gauge, Smartphone } from "lucide-react";
 import { getPlatform, platforms } from "@/lib/platforms";
 import { PlatformIcon } from "@/lib/platform-icons";
 import { getArticle } from "@/lib/platform-content";
@@ -48,8 +48,8 @@ export const Route = createFileRoute("/$platform")({
 
     const jsonLd: Record<string, unknown>[] = [
       {
-        "@context": "https://schema.org",
-        "@type": "SoftwareApplication",
+"@context": "https://schema.org",
+"@type": "SoftwareApplication",
         name: `${platform.name} Video Downloader`,
         url,
         image,
@@ -59,21 +59,21 @@ export const Route = createFileRoute("/$platform")({
         browserRequirements: "Requires JavaScript. Works in any modern browser.",
         featureList: [
           `Download ${platform.name} videos in HD`,
-          "No watermark",
-          "No sign-up or app required",
-          "Free and unlimited",
+"No watermark",
+"No sign-up or app required",
+"Free and unlimited",
         ],
         offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
       },
       {
-        "@context": "https://schema.org",
-        "@type": "Article",
+"@context": "https://schema.org",
+"@type": "Article",
         headline: title,
         description,
         image,
         author: { "@type": "Organization", name: "Free Online Video Downloader" },
         publisher: {
-          "@type": "Organization",
+"@type": "Organization",
           name: "Free Online Video Downloader",
           logo: { "@type": "ImageObject", url: `${SITE}/og/${platform.slug}.jpg` },
         },
@@ -82,19 +82,19 @@ export const Route = createFileRoute("/$platform")({
         dateModified: nowIso,
       },
       {
-        "@context": "https://schema.org",
-        "@type": "HowTo",
+"@context": "https://schema.org",
+"@type": "HowTo",
         name: `How to download ${platform.name} videos`,
         step: howToSteps.map((s, i) => ({
-          "@type": "HowToStep",
+"@type": "HowToStep",
           position: i + 1,
           name: s.name,
           text: s.text,
         })),
       },
       {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
+"@context": "https://schema.org",
+"@type": "BreadcrumbList",
         itemListElement: [
           { "@type": "ListItem", position: 1, name: "Home", item: SITE },
           { "@type": "ListItem", position: 2, name: `${platform.name} Downloader`, item: url },
@@ -104,10 +104,10 @@ export const Route = createFileRoute("/$platform")({
 
     if (article.faqs.length) {
       jsonLd.push({
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
+"@context": "https://schema.org",
+"@type": "FAQPage",
         mainEntity: article.faqs.map((f) => ({
-          "@type": "Question",
+"@type": "Question",
           name: f.q,
           acceptedAnswer: { "@type": "Answer", text: f.a },
         })),
@@ -144,15 +144,28 @@ export const Route = createFileRoute("/$platform")({
 });
 
 const steps = [
-  { icon: ClipboardPaste, title: "Copy the link", text: "Grab the video URL from the app or your browser." },
-  { icon: MousePointerClick, title: "Paste it here", text: "Drop the link into the box and hit download." },
-  { icon: Download, title: "Save it", text: "Choose your quality and the file is yours." },
+  { icon: Link2, title: "Copy the Link", text: "Grab the video URL from the app or your browser." },
+  { icon: ClipboardPaste, title: "Paste the URL", text: "Paste the link into the box above." },
+  { icon: MousePointerClick, title: "Click Download", text: "Hit the Download button to process it." },
+  { icon: Download, title: "Choose & Save", text: "Choose your quality and save the file." },
 ];
 
 const perks = [
-  { icon: Zap, title: "Blazing fast", text: "Servers optimised for instant, high-quality grabs." },
-  { icon: Gift, title: "100% free", text: "No sign-up, no limits, no hidden fees — ever." },
-  { icon: ShieldCheck, title: "Safe & private", text: "We never store your links or downloaded files." },
+  { icon: Zap, title: "Fast Online Tool", text: "Optimised servers for instant, high-quality grabs." },
+  { icon: Lock, title: "No Software Installation", text: "Everything runs in your browser — nothing to install." },
+  { icon: Globe, title: "Works in Browser", text: "Use it on any modern browser, anywhere." },
+  { icon: MonitorSmartphone, title: "Mobile & Desktop Friendly", text: "Works great on phones, tablets and computers." },
+  { icon: FileVideo, title: "MP4 Download", text: "Save clips as MP4 where the source allows." },
+  { icon: BadgeCheck, title: "HD Quality", text: "Grab the highest available resolution." },
+  { icon: ShieldCheck, title: "Clean & Secure", text: "We never store your links or downloaded files." },
+];
+
+const downloadOptions = [
+  { icon: FileVideo, title: "MP4 Video", text: "Download MP4 videos." },
+  { icon: Music, title: "MP3 Audio", text: "Extract MP3 audio." },
+  { icon: BadgeCheck, title: "HD Quality", text: "High quality download." },
+  { icon: Gauge, title: "Standard Quality", text: "Normal quality files." },
+  { icon: Smartphone, title: "Mobile Friendly", text: "Works on all mobile devices." },
 ];
 
 function PlatformPage() {
@@ -191,21 +204,16 @@ function PlatformPage() {
       <main>
 
         {/* Hero */}
-        <section className="relative overflow-hidden">
-          <div className="bg-grid absolute inset-0 opacity-60" />
-          <div
-            className="absolute left-1/2 top-0 h-[420px] w-[820px] -translate-x-1/2 rounded-full blur-3xl"
-            style={{ background: "color-mix(in oklab, var(--brand) 22%, transparent)" }}
-          />
-          <div className="relative mx-auto max-w-3xl px-4 pb-4 pt-16 text-center sm:pt-24">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-4 py-1.5 text-sm font-medium text-muted-foreground backdrop-blur">
+        <section className="relative overflow-hidden bg-hero">
+          <div className="bg-grid absolute inset-0 opacity-50" />
+          <div className="relative mx-auto max-w-3xl px-4 pb-6 pt-16 text-center sm:pt-24">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 text-sm font-bold text-foreground shadow-soft">
               <PlatformIcon slug={platform.slug} className="h-4 w-4 text-brand" />
               {platform.tagline}
             </div>
-            <h1 className="text-balance text-4xl font-bold leading-[1.05] sm:text-6xl">
-              <span className="text-gradient-brand">{platform.name}</span>
-              <br />
-              Video Downloader
+            <h1 className="text-balance text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
+              {platform.name}{" "}
+              <span className="text-gradient-brand">Video Downloader</span>
             </h1>
             <p className="mx-auto mt-5 max-w-xl text-balance text-base text-muted-foreground sm:text-lg">
               {platform.description}
@@ -214,72 +222,119 @@ function PlatformPage() {
             <div className="mt-10">
               <PlatformDownloader platform={platform} downloadAdUrl={ads.download?.link_url} />
             </div>
+
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm font-semibold text-muted-foreground">
+              <span className="inline-flex items-center gap-1.5">
+                <BadgeCheck className="h-4 w-4 text-primary" /> No app needed
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <BadgeCheck className="h-4 w-4 text-primary" /> Works on mobile &amp; desktop
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <BadgeCheck className="h-4 w-4 text-primary" /> Fast processing
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <BadgeCheck className="h-4 w-4 text-primary" /> MP4/HD where available
+              </span>
+            </div>
           </div>
         </section>
 
+
         {/* Steps */}
-        <section className="mx-auto max-w-5xl px-4 py-20">
-          <h2 className="text-center text-2xl font-bold sm:text-3xl">
-            Download in three steps
+        <section className="mx-auto max-w-5xl px-4 py-16 sm:py-20">
+          <h2 className="text-center text-2xl font-extrabold sm:text-3xl">
+            How to Download {platform.name} Videos Online
           </h2>
-          <div className="mt-10 grid gap-5 sm:grid-cols-3">
+          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {steps.map((s, i) => (
               <div
                 key={s.title}
-                className="relative rounded-3xl border border-border bg-card p-6 shadow-elegant"
+                className="relative flex flex-col items-center rounded-2xl border border-border bg-card p-6 text-center shadow-soft"
               >
-                <span className="absolute right-5 top-4 font-display text-5xl font-bold text-brand/15">
-                  {i + 1}
+                <span className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-soft">
+                  <s.icon className="h-6 w-6" />
+                  <span className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full border border-border bg-card text-xs font-extrabold text-primary">
+                    {i + 1}
+                  </span>
                 </span>
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand/15 text-brand">
-                  <s.icon className="h-5 w-5" />
-                </div>
-                <h3 className="mt-4 text-lg font-bold">{s.title}</h3>
+                <h3 className="mt-4 text-base font-bold">{s.title}</h3>
                 <p className="mt-1.5 text-sm text-muted-foreground">{s.text}</p>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Perks */}
+        {/* Why use */}
         <section className="mx-auto max-w-5xl px-4 pb-8">
-          <div className="grid gap-5 sm:grid-cols-3">
+          <h2 className="text-center text-2xl font-extrabold sm:text-3xl">
+            Why Use This {platform.name} Video Downloader?
+          </h2>
+          <div className="mt-10 grid grid-cols-2 gap-5 text-center sm:grid-cols-3 lg:grid-cols-4">
             {perks.map((p) => (
-              <div key={p.title} className="rounded-3xl border border-border bg-card/60 p-6">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-secondary text-brand">
+              <div key={p.title} className="flex flex-col items-center">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                   <p.icon className="h-5 w-5" />
                 </div>
-                <h3 className="mt-4 text-lg font-bold">{p.title}</h3>
-                <p className="mt-1.5 text-sm text-muted-foreground">{p.text}</p>
+                <h3 className="mt-3 text-sm font-bold">{p.title}</h3>
+                <p className="mt-1 text-xs text-muted-foreground">{p.text}</p>
               </div>
             ))}
           </div>
         </section>
 
+        {/* Available download options */}
+        <section className="mx-auto max-w-5xl px-4 py-16 sm:py-20">
+          <h2 className="text-center text-2xl font-extrabold sm:text-3xl">Available Download Options</h2>
+          <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+            {downloadOptions.map((o) => (
+              <div
+                key={o.title}
+                className="rounded-2xl border border-border bg-card p-5 shadow-soft"
+              >
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <o.icon className="h-5 w-5" />
+                </div>
+                <h3 className="mt-4 text-sm font-bold">{o.title}</h3>
+                <p className="mt-1 text-xs text-muted-foreground">{o.text}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mx-auto mt-6 max-w-2xl text-center text-xs text-muted-foreground">
+            Download options depend on video availability, platform rules, and original upload quality.
+          </p>
+        </section>
+
         {/* SEO article */}
         <PlatformArticleView platform={platform} article={article} />
 
-
-        {/* Other platforms */}
+        {/* More downloader tools */}
         <section className="mx-auto max-w-5xl px-4 py-16">
-
-          <h2 className="text-center text-2xl font-bold sm:text-3xl">
-            Download from other platforms
+          <h2 className="text-center text-2xl font-extrabold sm:text-3xl">
+            More Video Downloader Tools
           </h2>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            {others.map((p) => (
+          <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+            {others.slice(0, 10).map((p) => (
               <Link
                 key={p.slug}
                 to="/$platform"
                 params={{ platform: p.slug }}
-                style={{ ["--brand" as string]: p.color }}
-                className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium transition-colors hover:border-brand/50 hover:bg-secondary"
+                style={{ color: p.color }}
+                className="group flex flex-col items-center rounded-2xl border border-border bg-card p-5 text-center shadow-soft transition-all hover:-translate-y-1 hover:shadow-soft-lg"
               >
-                <PlatformIcon slug={p.slug} className="h-4 w-4 text-brand" /> {p.name}
+                <span
+                  className="flex h-12 w-12 items-center justify-center rounded-2xl"
+                  style={{ background: "color-mix(in oklab, currentColor 14%, white)" }}
+                >
+                  <PlatformIcon slug={p.slug} className="h-6 w-6" />
+                </span>
+                <h3 className="mt-3 text-sm font-bold leading-tight text-foreground">{p.name}</h3>
+                <p className="text-xs font-medium text-muted-foreground">Video Downloader</p>
               </Link>
             ))}
           </div>
         </section>
+
 
         {/* Bottom banner ad */}
         {ads.bottom?.code && (

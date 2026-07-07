@@ -187,7 +187,7 @@ function FieldEditor({
               <span className="text-xs font-semibold text-muted-foreground">#{i + 1}</span>
               <button
                 onClick={() => remove(i)}
-                className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-destructive transition-colors hover:bg-destructive/10"
+                className="inline-flex items-center gap-1 rounded-2xl px-2 py-1 text-xs font-medium text-destructive transition-colors hover:bg-destructive/10"
               >
                 <Trash2 className="h-3.5 w-3.5" /> Remove
               </button>
@@ -196,7 +196,7 @@ function FieldEditor({
               value={it.a}
               placeholder={field.labelA}
               onChange={(e) => update(i, { a: e.target.value })}
-              className="mb-2 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:border-ring"
+              className="mb-2 w-full rounded-2xl border border-input bg-background px-3 py-2 text-sm outline-none focus:border-ring"
             />
             {field.multilineB ? (
               <textarea
@@ -204,14 +204,14 @@ function FieldEditor({
                 value={it.b}
                 placeholder={field.labelB}
                 onChange={(e) => update(i, { b: e.target.value })}
-                className="w-full resize-y rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:border-ring"
+                className="w-full resize-y rounded-2xl border border-input bg-background px-3 py-2 text-sm outline-none focus:border-ring"
               />
             ) : (
               <input
                 value={it.b}
                 placeholder={field.labelB}
                 onChange={(e) => update(i, { b: e.target.value })}
-                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:border-ring"
+                className="w-full rounded-2xl border border-input bg-background px-3 py-2 text-sm outline-none focus:border-ring"
               />
             )}
           </div>

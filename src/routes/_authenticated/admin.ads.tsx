@@ -17,7 +17,7 @@ type Draft = { name: string; code: string; link_url: string; enabled: boolean };
 const EMPTY_DRAFT: Draft = { name: "", code: "", link_url: "", enabled: false };
 
 const inputCls =
-  "w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary";
+"w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary";
 
 function AdminAds() {
   const queryClient = useQueryClient();

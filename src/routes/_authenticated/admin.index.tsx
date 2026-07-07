@@ -88,7 +88,7 @@ function AdminPosts() {
                   <Link
                     to="/admin/$id"
                     params={{ id: p.id }}
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-2xl text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
                     aria-label="Edit"
                   >
                     <Pencil className="h-4 w-4" />
@@ -98,7 +98,7 @@ function AdminPosts() {
                       if (window.confirm(`Delete "${p.title}"?`)) del.mutate(p.id);
                     }}
                     disabled={del.isPending}
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/15 hover:text-destructive disabled:opacity-50"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-2xl text-muted-foreground transition-colors hover:bg-destructive/15 hover:text-destructive disabled:opacity-50"
                     aria-label="Delete"
                   >
                     <Trash2 className="h-4 w-4" />

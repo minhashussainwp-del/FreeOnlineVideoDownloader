@@ -86,7 +86,7 @@ function useFocusHashField() {
 
 
 const inputCls =
-  "w-full rounded-xl border border-border bg-card px-3.5 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/30";
+"w-full rounded-xl border border-border bg-card px-3.5 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/30";
 
 function counterColor(len: number, min: number, max: number) {
   if (len === 0) return "text-muted-foreground";
@@ -213,7 +213,7 @@ export function PostEditor({ post }: { post?: PostRow | null }) {
         {/* Yoast-style SEO panel */}
         <div className="rounded-2xl border border-border bg-card p-5">
           <div className="mb-4 flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/15 text-primary">
+            <span className="flex h-8 w-8 items-center justify-center rounded-2xl bg-primary/15 text-primary">
               <Search className="h-4 w-4" />
             </span>
             <div>
@@ -318,7 +318,7 @@ export function PostEditor({ post }: { post?: PostRow | null }) {
               <button
                 type="button"
                 onClick={() => setFeaturedImage("")}
-                className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-background/80 text-foreground backdrop-blur transition-colors hover:bg-destructive hover:text-destructive-foreground"
+                className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-2xl bg-background/80 text-foreground backdrop-blur transition-colors hover:bg-destructive hover:text-destructive-foreground"
                 aria-label="Remove image"
               >
                 <X className="h-4 w-4" />

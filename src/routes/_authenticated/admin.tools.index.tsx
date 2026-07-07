@@ -141,7 +141,7 @@ function ToolCard({
             value={name}
             placeholder={platform.name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:border-ring"
+            className="w-full rounded-2xl border border-input bg-background px-3 py-2 text-sm outline-none focus:border-ring"
           />
         </div>
         <div>
@@ -150,7 +150,7 @@ function ToolCard({
             value={tagline}
             placeholder={platform.tagline}
             onChange={(e) => setTagline(e.target.value)}
-            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:border-ring"
+            className="w-full rounded-2xl border border-input bg-background px-3 py-2 text-sm outline-none focus:border-ring"
           />
         </div>
         <div className="sm:col-span-2">
@@ -162,7 +162,7 @@ function ToolCard({
             value={description}
             placeholder={platform.description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full resize-y rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:border-ring"
+            className="w-full resize-y rounded-2xl border border-input bg-background px-3 py-2 text-sm outline-none focus:border-ring"
           />
         </div>
       </div>

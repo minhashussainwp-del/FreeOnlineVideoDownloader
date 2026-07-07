@@ -204,9 +204,9 @@ export function ChatStudio() {
               {!noProviders && (
                 <div className="mt-2 flex flex-wrap justify-center gap-2">
                   {[
-                    "Audit the SEO of all my published posts and list the top issues",
-                    "Fix the meta title & description of my latest post",
-                    "Analyze the SEO of https://freevideodownloader.lovable.app and fix what you can",
+"Audit the SEO of all my published posts and list the top issues",
+"Fix the meta title & description of my latest post",
+"Analyze the SEO of https://freevideodownloader.lovable.app and fix what you can",
                   ].map((s) => (
                     <button
                       key={s}
@@ -250,12 +250,12 @@ export function ChatStudio() {
                     );
                   }
                   const toolLabels: Record<string, string> = {
-                    "tool-web_search": "Searching the web…",
-                    "tool-read_url": "Reading a source…",
-                    "tool-list_site_posts": "Loading your posts…",
-                    "tool-audit_post": "Auditing post SEO…",
-                    "tool-analyze_url": "Analyzing page SEO…",
-                    "tool-apply_post_seo": "Applying SEO fixes…",
+"tool-web_search": "Searching the web…",
+"tool-read_url": "Reading a source…",
+"tool-list_site_posts": "Loading your posts…",
+"tool-audit_post": "Auditing post SEO…",
+"tool-analyze_url": "Analyzing page SEO…",
+"tool-apply_post_seo": "Applying SEO fixes…",
                   };
                   if (part.type in toolLabels) {
                     const Icon =
@@ -271,7 +271,7 @@ export function ChatStudio() {
                     return (
                       <div
                         key={i}
-                        className="my-1 inline-flex items-center gap-1.5 rounded-lg bg-secondary px-2.5 py-1 text-xs text-muted-foreground"
+                        className="my-1 inline-flex items-center gap-1.5 rounded-2xl bg-secondary px-2.5 py-1 text-xs text-muted-foreground"
                       >
                         <Icon className="h-3.5 w-3.5" /> {toolLabels[part.type]}
                       </div>

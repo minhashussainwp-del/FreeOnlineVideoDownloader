@@ -17,7 +17,7 @@ export const Route = createFileRoute("/_authenticated/admin/tools/$slug")({
 });
 
 const inputCls =
-  "w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary";
+"w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary";
 const labelCls = "text-sm font-semibold text-foreground";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
@@ -94,7 +94,7 @@ function AdminToolEditor() {
         <div className="flex items-center gap-3">
           <Link
             to="/admin/tools"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-2xl text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
             aria-label="Back"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -312,7 +312,7 @@ function PairListField<T>({
             />
             <button
               onClick={() => set(pairs.filter((_, j) => j !== i))}
-              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-destructive/15 hover:text-destructive"
+              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl text-muted-foreground hover:bg-destructive/15 hover:text-destructive"
               aria-label="Remove"
             >
               <Trash2 className="h-4 w-4" />
@@ -376,7 +376,7 @@ function TripleListField({
             />
             <button
               onClick={() => onChange(rows.filter((_, j) => j !== i))}
-              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-destructive/15 hover:text-destructive"
+              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl text-muted-foreground hover:bg-destructive/15 hover:text-destructive"
               aria-label="Remove"
             >
               <Trash2 className="h-4 w-4" />

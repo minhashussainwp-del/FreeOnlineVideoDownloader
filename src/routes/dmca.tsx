@@ -5,7 +5,7 @@ export const Route = createFileRoute("/dmca")({
   head: () => {
     const title = "Copyright & DMCA Policy — Free Online Video Downloader";
     const description =
-      "How to report copyright concerns to Free Online Video Downloader. We respect intellectual property rights and respond to valid notices.";
+"How to report copyright concerns to Free Online Video Downloader. We respect intellectual property rights and respond to valid notices.";
     return {
       meta: [
         { title },

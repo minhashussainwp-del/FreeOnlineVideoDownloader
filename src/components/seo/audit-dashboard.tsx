@@ -165,7 +165,7 @@ function AuditRow({ row }: { row: SeoAuditRow }) {
                 onClick={() => previewFixes.mutate()}
                 disabled={previewFixes.isPending || applyFixes.isPending}
                 title={`Preview AI fixes for ${fixable.length} issue${fixable.length === 1 ? "" : "s"}`}
-                className="inline-flex items-center gap-1 rounded-lg bg-primary/10 px-2 py-1 text-xs font-semibold text-primary transition-colors hover:bg-primary/20 disabled:opacity-60"
+                className="inline-flex items-center gap-1 rounded-2xl bg-primary/10 px-2 py-1 text-xs font-semibold text-primary transition-colors hover:bg-primary/20 disabled:opacity-60"
               >
                 {previewFixes.isPending ? (
                   <Loader2 className="h-3 w-3 animate-spin" />
@@ -242,7 +242,7 @@ function AuditRow({ row }: { row: SeoAuditRow }) {
                 <button
                   onClick={() => previewFixes.mutate()}
                   disabled={previewFixes.isPending || applyFixes.isPending}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-primary to-accent px-3 py-1.5 text-xs font-bold text-primary-foreground transition-transform hover:scale-[1.03] disabled:opacity-60"
+                  className="inline-flex items-center gap-1.5 rounded-2xl bg-gradient-to-r from-primary to-accent px-3 py-1.5 text-xs font-bold text-primary-foreground transition-transform hover:scale-[1.03] disabled:opacity-60"
                 >
                   {previewFixes.isPending ? (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -275,7 +275,7 @@ function DiffValue({ text, tone }: { text: string; tone: "from" | "to" }) {
   const empty = !text.trim();
   return (
     <div
-      className={`rounded-md border px-2.5 py-1.5 text-xs ${
+      className={`rounded-xl border px-2.5 py-1.5 text-xs ${
         tone === "to"
           ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
           : "border-border bg-muted/40 text-muted-foreground line-through decoration-destructive/50"
@@ -367,14 +367,14 @@ function FixPreviewDialog({
           <button
             onClick={onCancel}
             disabled={applying}
-            className="inline-flex items-center justify-center rounded-lg border border-border px-4 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground disabled:opacity-60"
+            className="inline-flex items-center justify-center rounded-2xl border border-border px-4 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground disabled:opacity-60"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
             disabled={applying}
-            className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-gradient-to-r from-primary to-accent px-4 py-2 text-sm font-bold text-primary-foreground transition-transform hover:scale-[1.03] disabled:opacity-60"
+            className="inline-flex items-center justify-center gap-1.5 rounded-2xl bg-gradient-to-r from-primary to-accent px-4 py-2 text-sm font-bold text-primary-foreground transition-transform hover:scale-[1.03] disabled:opacity-60"
           >
             {applying ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
             Apply {preview?.fixedCount ?? 0} fix
@@ -589,14 +589,14 @@ export function AuditDashboard() {
             run ? (
               <span className={scoreTone(run.avg_score ?? 0)}>{run.avg_score ?? 0}</span>
             ) : (
-              "—"
+"—"
             )
           }
           sub={
             run ? (
               <Delta current={run.avg_score ?? 0} previous={run.prev_avg_score} />
             ) : (
-              "no runs yet"
+"no runs yet"
             )
           }
         />
@@ -627,7 +627,7 @@ export function AuditDashboard() {
                 {new Date(run.created_at).toLocaleDateString()}
               </span>
             ) : (
-              "—"
+"—"
             )
           }
           sub={run ? `${run.trigger} run` : undefined}
@@ -641,7 +641,7 @@ export function AuditDashboard() {
           <select
             value={selectedRun ?? (run?.id ?? "")}
             onChange={(e) => setSelectedRun(e.target.value || undefined)}
-            className="rounded-lg border border-border bg-card px-3 py-1.5 text-sm"
+            className="rounded-2xl border border-border bg-card px-3 py-1.5 text-sm"
           >
             {runs.data!.map((r) => (
               <option key={r.id} value={r.id}>

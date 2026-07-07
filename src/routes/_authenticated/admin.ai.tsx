@@ -25,7 +25,7 @@ function AiWriterPage() {
       <div className="inline-flex rounded-xl border border-border bg-card p-1">
         <button
           onClick={() => setTab("studio")}
-          className={`inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
+          className={`inline-flex items-center gap-1.5 rounded-2xl px-4 py-2 text-sm font-semibold transition-colors ${
             tab === "studio" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
           }`}
         >
@@ -33,7 +33,7 @@ function AiWriterPage() {
         </button>
         <button
           onClick={() => setTab("providers")}
-          className={`inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
+          className={`inline-flex items-center gap-1.5 rounded-2xl px-4 py-2 text-sm font-semibold transition-colors ${
             tab === "providers" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
           }`}
         >

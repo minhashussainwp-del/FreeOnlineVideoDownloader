@@ -41,7 +41,7 @@ function AuthPage() {
   };
 
   const inputCls =
-    "w-full rounded-xl border border-border bg-card py-2.5 pl-10 pr-3.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/30";
+"w-full rounded-xl border border-border bg-card py-2.5 pl-10 pr-3.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/30";
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4">

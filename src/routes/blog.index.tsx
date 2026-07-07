@@ -1,10 +1,12 @@
+import { useState, useMemo } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowRight, Newspaper, Clock } from "lucide-react";
+import { ArrowRight, Clock, Search, Mail, Folder } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { listPublishedPosts } from "@/lib/blog.functions";
 import { formatDate } from "@/lib/blog-utils";
+import { useBranding } from "@/lib/use-site-data";
 
 const postsQuery = queryOptions({
   queryKey: ["published-posts"],
@@ -50,9 +52,14 @@ export const Route = createFileRoute("/blog/")({
   component: BlogIndex,
 });
 
-function CategoryBadge({ children }: { children: React.ReactNode }) {
+function readTime(p: { excerpt?: string | null; title?: string | null }) {
+  const len = (p.excerpt?.length ?? 0) + (p.title?.length ?? 0);
+  return `${Math.max(3, Math.ceil(len / 120))} min read`;
+}
+
+function CategoryTag({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center rounded-full bg-primary/15 px-2.5 py-0.5 text-xs font-semibold text-primary">
+    <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-primary">
       {children}
     </span>
   );
@@ -60,113 +67,209 @@ function CategoryBadge({ children }: { children: React.ReactNode }) {
 
 function BlogIndex() {
   const { data: posts } = useSuspenseQuery(postsQuery);
-  const [featured, ...rest] = posts;
+  const branding = useBranding();
+  const [query, setQuery] = useState("");
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return posts;
+    return posts.filter(
+      (p) =>
+        p.title?.toLowerCase().includes(q) ||
+        p.excerpt?.toLowerCase().includes(q) ||
+        p.category?.toLowerCase().includes(q),
+    );
+  }, [posts, query]);
+
+  const categories = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const p of posts) {
+      if (p.category) map.set(p.category, (map.get(p.category) ?? 0) + 1);
+    }
+    return Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
+  }, [posts]);
+
+  const popular = posts.slice(0, 4);
 
   return (
     <div className="min-h-screen">
       <SiteHeader />
       <main>
-        <section className="relative overflow-hidden border-b border-border/60">
-          <div className="bg-grid absolute inset-0 opacity-40" />
-          <div className="absolute left-1/2 top-0 h-64 w-[720px] -translate-x-1/2 rounded-full bg-primary/15 blur-3xl" />
-          <div className="relative mx-auto max-w-6xl px-4 py-16 text-center sm:py-20">
-            <p className="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold uppercase tracking-widest text-primary">
-              <Newspaper className="h-4 w-4" /> The Blog
-            </p>
-            <h1 className="text-balance text-4xl font-bold sm:text-5xl">
-              Tips, guides & how-tos
+        {/* Hero */}
+        <section className="relative overflow-hidden border-b border-border bg-hero">
+          <div className="bg-grid absolute inset-0 opacity-50" />
+          <div className="relative mx-auto max-w-3xl px-4 py-16 text-center sm:py-20">
+            <h1 className="text-balance text-4xl font-extrabold tracking-tight sm:text-5xl">
+              {branding.siteName} <span className="text-gradient-brand">Blog</span>
             </h1>
-            <p className="mx-auto mt-5 max-w-xl text-balance text-muted-foreground">
-              Everything you need to download smarter — practical walkthroughs and platform tips.
+            <p className="mx-auto mt-4 max-w-xl text-balance text-lg text-muted-foreground">
+              Tips, guides, news, and everything about video downloading.
             </p>
+            <div className="mx-auto mt-8 flex max-w-lg items-center gap-2 rounded-2xl border border-border bg-card px-4 py-2 shadow-soft-lg">
+              <Search className="h-5 w-5 shrink-0 text-muted-foreground" />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search blog articles..."
+                className="w-full bg-transparent py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+              />
+            </div>
           </div>
         </section>
 
         <section className="mx-auto max-w-6xl px-4 py-14">
-          {posts.length === 0 ? (
-            <div className="rounded-3xl border border-dashed border-border bg-card/50 px-6 py-20 text-center">
-              <h2 className="font-display text-lg font-bold">No articles yet</h2>
-              <p className="mt-1 text-sm text-muted-foreground">Check back soon for new posts.</p>
+          <div className="grid gap-10 lg:grid-cols-[1fr_18rem]">
+            {/* Articles */}
+            <div>
+              <h2 className="mb-6 text-2xl font-extrabold tracking-tight">Latest Articles</h2>
+              {filtered.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-border bg-card px-6 py-20 text-center">
+                  <h3 className="font-display text-lg font-bold">No articles found</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Try a different search term or check back soon.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-5">
+                  {filtered.map((p) => (
+                    <Link
+                      key={p.id}
+                      to="/blog/$slug"
+                      params={{ slug: p.slug }}
+                      className="group flex gap-4 rounded-2xl border border-border bg-card p-3 shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-soft-lg sm:gap-5 sm:p-4"
+                    >
+                      <div className="relative aspect-square w-24 shrink-0 overflow-hidden rounded-xl sm:w-36 sm:aspect-video">
+                        {p.featured_image ? (
+                          <img
+                            src={p.featured_image}
+                            alt={p.title}
+                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="h-full w-full bg-gradient-to-br from-primary to-accent" />
+                        )}
+                      </div>
+                      <div className="flex min-w-0 flex-1 flex-col">
+                        {p.category && (
+                          <div className="mb-1.5">
+                            <CategoryTag>{p.category}</CategoryTag>
+                          </div>
+                        )}
+                        <h3 className="font-display text-base font-bold leading-snug sm:text-lg">
+                          {p.title}
+                        </h3>
+                        {p.excerpt && (
+                          <p className="mt-1.5 line-clamp-2 text-sm text-muted-foreground">
+                            {p.excerpt}
+                          </p>
+                        )}
+                        <div className="mt-auto flex items-center gap-3 pt-3 text-xs text-muted-foreground">
+                          <span>{formatDate(p.published_at)}</span>
+                          <span className="inline-flex items-center gap-1">
+                            <Clock className="h-3 w-3" /> {readTime(p)}
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
-          ) : (
-            <div className="grid auto-rows-fr grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {featured && (
-                <Link
-                  to="/blog/$slug"
-                  params={{ slug: featured.slug }}
-                  className="group relative flex flex-col justify-end overflow-hidden rounded-3xl border border-border bg-card p-6 shadow-elegant transition-transform hover:-translate-y-1 sm:col-span-2 lg:row-span-2 lg:min-h-[420px]"
-                >
-                  {featured.featured_image ? (
-                    <>
-                      <img
-                        src={featured.featured_image}
-                        alt={featured.title}
-                        className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/10" />
-                    </>
-                  ) : (
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/25 to-accent/10" />
-                  )}
-                  <div className="relative">
-                    <div className="mb-3 flex items-center gap-2">
-                      {featured.category && <CategoryBadge>{featured.category}</CategoryBadge>}
-                      <span className="text-xs text-muted-foreground">
-                        {formatDate(featured.published_at)}
+
+            {/* Sidebar */}
+            <aside className="space-y-6">
+              {categories.length > 0 && (
+                <div className="rounded-2xl border border-border bg-card p-5 shadow-soft">
+                  <h3 className="font-display text-sm font-extrabold uppercase tracking-wide">
+                    Categories
+                  </h3>
+                  <div className="mt-4 space-y-1">
+                    <button
+                      onClick={() => setQuery("")}
+                      className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                    >
+                      <span className="inline-flex items-center gap-2">
+                        <Folder className="h-4 w-4" /> All Articles
                       </span>
-                    </div>
-                    <h2 className="font-display text-2xl font-bold text-balance sm:text-3xl">
-                      {featured.title}
-                    </h2>
-                    {featured.excerpt && (
-                      <p className="mt-2 line-clamp-2 max-w-xl text-muted-foreground">
-                        {featured.excerpt}
-                      </p>
-                    )}
-                    <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
-                      Read article <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                    </span>
+                      <span className="font-bold text-foreground">{posts.length}</span>
+                    </button>
+                    {categories.map(([name, count]) => (
+                      <button
+                        key={name}
+                        onClick={() => setQuery(name)}
+                        className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                      >
+                        <span className="inline-flex items-center gap-2">
+                          <Folder className="h-4 w-4" /> {name}
+                        </span>
+                        <span className="font-bold text-foreground">{count}</span>
+                      </button>
+                    ))}
                   </div>
-                </Link>
+                </div>
               )}
 
-              {rest.map((p) => (
-                <Link
-                  key={p.id}
-                  to="/blog/$slug"
-                  params={{ slug: p.slug }}
-                  className="group flex flex-col overflow-hidden rounded-3xl border border-border bg-card transition-transform hover:-translate-y-1"
+              {popular.length > 0 && (
+                <div className="rounded-2xl border border-border bg-card p-5 shadow-soft">
+                  <h3 className="font-display text-sm font-extrabold uppercase tracking-wide">
+                    Popular Articles
+                  </h3>
+                  <div className="mt-4 space-y-3">
+                    {popular.map((p) => (
+                      <Link
+                        key={p.id}
+                        to="/blog/$slug"
+                        params={{ slug: p.slug }}
+                        className="group flex items-center gap-3"
+                      >
+                        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl">
+                          {p.featured_image ? (
+                            <img
+                              src={p.featured_image}
+                              alt={p.title}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <div className="h-full w-full bg-gradient-to-br from-primary to-accent" />
+                          )}
+                        </div>
+                        <span className="line-clamp-2 text-sm font-semibold leading-snug transition-colors group-hover:text-primary">
+                          {p.title}
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="rounded-2xl border border-border bg-card p-5 shadow-soft">
+                <h3 className="inline-flex items-center gap-2 font-display text-sm font-extrabold uppercase tracking-wide">
+                  <Mail className="h-4 w-4 text-primary" /> Newsletter
+                </h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Get tips, guides, and updates straight to your inbox.
+                </p>
+                <form
+                  className="mt-4 space-y-2"
+                  onSubmit={(e) => e.preventDefault()}
                 >
-                  <div className="relative aspect-video overflow-hidden">
-                    {p.featured_image ? (
-                      <img
-                        src={p.featured_image}
-                        alt={p.title}
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="h-full w-full bg-gradient-to-br from-primary/25 to-accent/10" />
-                    )}
-                  </div>
-                  <div className="flex flex-1 flex-col p-5">
-                    <div className="mb-2 flex items-center gap-2">
-                      {p.category && <CategoryBadge>{p.category}</CategoryBadge>}
-                      <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                        <Clock className="h-3 w-3" /> {formatDate(p.published_at)}
-                      </span>
-                    </div>
-                    <h3 className="font-display text-lg font-bold leading-snug">{p.title}</h3>
-                    {p.excerpt && (
-                      <p className="mt-1.5 line-clamp-2 text-sm text-muted-foreground">{p.excerpt}</p>
-                    )}
-                    <span className="mt-auto pt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
-                      Read more <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                    </span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
+                  <input
+                    type="email"
+                    required
+                    placeholder="Enter your email"
+                    className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                  />
+                  <button
+                    type="submit"
+                    className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-primary to-accent px-4 py-2.5 text-sm font-bold text-primary-foreground transition-transform hover:scale-[1.02] active:scale-95"
+                  >
+                    Subscribe <ArrowRight className="h-4 w-4" />
+                  </button>
+                </form>
+              </div>
+            </aside>
+          </div>
         </section>
       </main>
       <SiteFooter />

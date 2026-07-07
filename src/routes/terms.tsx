@@ -5,7 +5,7 @@ export const Route = createFileRoute("/terms")({
   head: () => {
     const title = "Terms of Service — Free Online Video Downloader";
     const description =
-      "The terms for using the Free Online Video Downloader free video downloader, including acceptable use, responsibilities, and disclaimers.";
+"The terms for using the Free Online Video Downloader free video downloader, including acceptable use, responsibilities, and disclaimers.";
     return {
       meta: [
         { title },

@@ -1,11 +1,17 @@
 import { useState, useEffect } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Download, Menu, X, Mail, BookOpen } from "lucide-react";
+import {
+  Download,
+  Menu,
+  X,
+  Mail,
+  Home,
+  Newspaper,
+  ChevronRight,
+  type LucideIcon,
+} from "lucide-react";
 import { PlatformIcon } from "@/lib/platform-icons";
-import { useEnabledPlatforms, useBranding } from "@/lib/use-site-data";
-
-/** Platforms shown directly in the header; the rest go under "Others". */
-const PRIMARY_SLUGS = ["youtube", "facebook", "instagram", "tiktok"] as const;
+import { useBranding, useEnabledPlatforms } from "@/lib/use-site-data";
 
 /** Render a brand name with the last word highlighted in the primary color. */
 function renderBrand(name: string) {
@@ -14,164 +20,190 @@ function renderBrand(name: string) {
   const last = parts.pop();
   return (
     <>
-      {parts.join(" ")} <span className="text-primary">{last}</span>
+      {parts.join(" ")} <span className="text-gradient-brand">{last}</span>
     </>
   );
 }
 
-const pageLinks = [
-  { to: "/blog", label: "Blogs", icon: BookOpen },
-] as const;
+type NavItem = { label: string; to: string; hash?: string; icon: LucideIcon };
+
+const NAV: NavItem[] = [
+  { label: "Home", to: "/", icon: Home },
+];
+
+const BLOG: NavItem = { label: "Blog", to: "/blog", icon: Newspaper };
+
 
 export function SiteHeader() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [menuOpen, setMenuOpen] = useState(false);
-  const platforms = useEnabledPlatforms();
   const branding = useBranding();
+  const topPlatforms = useEnabledPlatforms().slice(0, 4);
 
-  // Only the primary platforms are shown in the header (in a fixed order).
-  const primary = PRIMARY_SLUGS.map((slug) => platforms.find((p) => p.slug === slug)).filter(
-    (p): p is NonNullable<typeof p> => Boolean(p),
-  );
-
-  // Close the mobile menu on route change
   useEffect(() => {
     setMenuOpen(false);
   }, [pathname]);
 
-
   return (
-    <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-border glass">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
-        <Link to="/" className="flex items-center gap-2 font-display text-lg font-bold">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-primary-foreground">
+        <Link to="/" className="flex items-center gap-2.5 font-display text-lg font-bold">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-soft">
             <Download className="h-5 w-5" strokeWidth={2.5} />
           </span>
-          <span className="leading-none">{renderBrand(branding.siteName)}</span>
+          <span className="leading-none tracking-tight">{renderBrand(branding.siteName)}</span>
         </Link>
 
         {/* Desktop nav */}
         <nav className="hidden items-center gap-1 lg:flex">
-          {primary.map((p) => {
+          {NAV.map((l) => {
+            const active =
+              !l.hash && (pathname === l.to || (l.to !== "/" && pathname.startsWith(`${l.to}/`)));
+            return (
+              <Link
+                key={l.label}
+                to={l.to}
+                hash={l.hash}
+                className={`rounded-full px-3.5 py-2 text-sm font-semibold transition-colors ${
+                  active
+                    ? "bg-secondary text-foreground"
+                    : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                }`}
+              >
+                {l.label}
+              </Link>
+            );
+          })}
+
+          {/* Top 4 platforms */}
+          {topPlatforms.map((p) => {
             const active = pathname === `/${p.slug}`;
             return (
               <Link
                 key={p.slug}
                 to="/$platform"
                 params={{ platform: p.slug }}
-                style={{ ["--brand" as string]: p.color }}
-                className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium transition-colors ${
-                  active ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                title={p.name}
+                style={{ color: active ? undefined : p.color }}
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold transition-colors ${
+                  active
+                    ? "bg-secondary text-foreground"
+                    : "hover:bg-secondary"
                 }`}
               >
-                <PlatformIcon slug={p.slug} className="h-4 w-4 text-brand" />
-                {p.name}
+                <PlatformIcon slug={p.slug} className="h-4 w-4" />
+                <span className="text-foreground">{p.name}</span>
               </Link>
             );
           })}
 
-
-          {pageLinks.map((l) => {
-            const active = pathname === l.to || pathname.startsWith(`${l.to}/`);
-            return (
-              <Link
-                key={l.to}
-                to={l.to}
-                className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium transition-colors ${
-                  active ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <l.icon className="h-4 w-4" />
-                {l.label}
-              </Link>
-            );
-          })}
+          {/* Blog (second last) */}
+          <Link
+            to={BLOG.to}
+            className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-semibold transition-colors ${
+              pathname.startsWith(BLOG.to)
+                ? "bg-secondary text-foreground"
+                : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+            }`}
+          >
+            <BLOG.icon className="h-4 w-4" />
+            {BLOG.label}
+          </Link>
 
           <Link
             to="/contact"
-            className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-primary to-accent px-4 py-2 text-sm font-semibold text-primary-foreground shadow-elegant transition-all hover:-translate-y-0.5 hover:shadow-lg active:scale-95"
+            className="ml-2 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-primary to-accent px-5 py-2 text-sm font-bold text-primary-foreground shadow-soft transition-transform hover:scale-[1.03] active:scale-95"
           >
             <Mail className="h-4 w-4" />
-            Contact us
+            Contact Us
           </Link>
         </nav>
 
-
-        <div className="flex items-center gap-2">
-
-
-          {/* Mobile toggle */}
-          <button
-            onClick={() => setMenuOpen((v) => !v)}
-            className={`inline-flex h-10 w-10 items-center justify-center rounded-xl border transition-all active:scale-95 lg:hidden ${
-              menuOpen
-                ? "border-primary/40 bg-primary/10 text-primary"
-                : "border-border bg-card text-foreground hover:bg-secondary"
-            }`}
-            aria-label="Toggle menu"
-            aria-expanded={menuOpen}
-          >
-            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
-        </div>
+        {/* Mobile toggle */}
+        <button
+          onClick={() => setMenuOpen((v) => !v)}
+          className={`inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border transition-all active:scale-95 lg:hidden ${
+            menuOpen ? "bg-primary text-primary-foreground" : "bg-card text-foreground"
+          }`}
+          aria-label="Toggle menu"
+          aria-expanded={menuOpen}
+        >
+          {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </button>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile menu — single-column dropdown, one item per line */}
       {menuOpen && (
-        <div className="animate-in fade-in slide-in-from-top-3 duration-200 border-t border-border/60 bg-background/95 backdrop-blur-xl lg:hidden">
-          <div className="mx-auto max-h-[80vh] max-w-6xl space-y-6 overflow-y-auto px-4 py-6">
-            <div>
-              <p className="mb-2.5 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                Downloaders
-              </p>
-              <div className="grid grid-cols-1 gap-2.5">
-                {primary.map((p) => (
-                  <Link
-                    key={p.slug}
-                    to="/$platform"
-                    params={{ platform: p.slug }}
-                    style={{ ["--brand" as string]: p.color }}
-                    className="group flex items-center gap-2.5 rounded-2xl border border-border bg-card p-3 transition-all active:scale-[0.97] hover:border-brand/40 hover:bg-brand/5"
-                  >
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand/15 text-brand ring-1 ring-brand/20 transition-transform group-hover:scale-110">
-                      <PlatformIcon slug={p.slug} className="h-4 w-4" />
-                    </span>
-                    <span className="truncate text-sm font-semibold">{p.name}</span>
-                  </Link>
-                ))}
-              </div>
-            </div>
+        <div className="animate-in fade-in slide-in-from-top-3 border-t border-border glass duration-200 lg:hidden">
+          <div className="mx-auto flex max-w-6xl flex-col divide-y divide-border px-4 py-3">
+            {NAV.map((l) => {
+              const Icon = l.icon;
+              const active =
+                pathname === l.to || (l.to !== "/" && pathname.startsWith(`${l.to}/`));
+              return (
+                <Link
+                  key={l.label}
+                  to={l.to}
+                  hash={l.hash}
+                  className={`flex items-center gap-3 py-3 text-sm font-semibold transition-colors active:scale-[0.99] ${
+                    active ? "text-primary" : "text-foreground"
+                  }`}
+                >
+                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-secondary text-primary">
+                    <Icon className="h-4 w-4" />
+                  </span>
+                  <span className="flex-1">{l.label}</span>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                </Link>
+              );
+            })}
 
-            <div>
-              <p className="mb-2.5 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                Pages
-              </p>
-              <div className="grid grid-cols-1 gap-2.5">
-                {pageLinks.map((l) => (
-                  <Link
-                    key={l.to}
-                    to={l.to}
-                    className="group flex items-center gap-2.5 rounded-2xl border border-border bg-card p-3 transition-all active:scale-[0.97] hover:border-primary/40 hover:bg-primary/5"
-                  >
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary ring-1 ring-primary/20 transition-transform group-hover:scale-110">
-                      <l.icon className="h-4 w-4" />
-                    </span>
-                    <span className="truncate text-sm font-semibold">{l.label}</span>
-                  </Link>
-                ))}
-              </div>
-            </div>
+            {/* Top 4 platforms — one per line */}
+            {topPlatforms.map((p) => (
+              <Link
+                key={p.slug}
+                to="/$platform"
+                params={{ platform: p.slug }}
+                className="flex items-center gap-3 py-3 text-sm font-semibold text-foreground transition-colors active:scale-[0.99]"
+              >
+                <span
+                  className="flex h-9 w-9 items-center justify-center rounded-xl"
+                  style={{
+                    color: p.color,
+                    background: "color-mix(in oklab, currentColor 14%, white)",
+                  }}
+                >
+                  <PlatformIcon slug={p.slug} className="h-4 w-4" />
+                </span>
+                <span className="flex-1">{p.name}</span>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </Link>
+            ))}
 
+            {/* Blog (second last) */}
             <Link
-              to="/contact"
-              className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-primary to-accent px-4 py-3 text-sm font-semibold text-primary-foreground shadow-elegant transition-all active:scale-[0.97]"
+              to={BLOG.to}
+              className={`flex items-center gap-3 py-3 text-sm font-semibold transition-colors active:scale-[0.99] ${
+                pathname.startsWith(BLOG.to) ? "text-primary" : "text-foreground"
+              }`}
             >
-              <Mail className="h-4 w-4" />
-              Contact us
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-secondary text-primary">
+                <BLOG.icon className="h-4 w-4" />
+              </span>
+              <span className="flex-1">{BLOG.label}</span>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
             </Link>
 
+            <div className="pt-3">
+              <Link
+                to="/contact"
+                className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-primary to-accent px-4 py-3 text-sm font-bold text-primary-foreground shadow-soft transition-all active:scale-[0.98]"
+              >
+                <Mail className="h-4 w-4" />
+                Contact Us
+              </Link>
+            </div>
           </div>
-
         </div>
       )}
     </header>

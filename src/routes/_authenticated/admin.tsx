@@ -17,7 +17,9 @@ function AdminLayout() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["admin-access"],
     queryFn: () => ensureAccess(),
-    retry: false,
+    retry: 2,
+    retryDelay: 500,
+    staleTime: 60_000,
   });
 
   const signOut = async () => {

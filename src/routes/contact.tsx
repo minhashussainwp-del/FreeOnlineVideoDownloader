@@ -9,7 +9,7 @@ export const Route = createFileRoute("/contact")({
   head: () => {
     const title = "Contact Free Online Video Downloader — Support & Feedback";
     const description =
-      "Get in touch with the Free Online Video Downloader team for support, feedback, or copyright concerns about our free video downloader.";
+"Get in touch with the Free Online Video Downloader team for support, feedback, or copyright concerns about our free video downloader.";
     return {
       meta: [
         { title },

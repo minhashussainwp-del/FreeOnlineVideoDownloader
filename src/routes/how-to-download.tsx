@@ -15,7 +15,7 @@ export const Route = createFileRoute("/how-to-download")({
   head: () => {
     const title = "How to Download Videos — Free Online Video Downloader";
     const description =
-      "Learn how to download videos and audio in three simple steps with Free Online Video Downloader. A quick guide, pro tips, and fixes that work for every supported platform.";
+"Learn how to download videos and audio in three simple steps with Free Online Video Downloader. A quick guide, pro tips, and fixes that work for every supported platform.";
     return {
       meta: [
         { title },
@@ -49,17 +49,17 @@ const steps = [
 ];
 
 const tips = [
-  "Copy the link directly from the app's share menu for the most reliable results.",
-  "Make sure the video is public — private and restricted posts can't be fetched.",
-  "On mobile, downloaded files usually appear in your Downloads folder or gallery.",
-  "For music and podcasts, choose the 'Audio only' option to save an MP3 or M4A.",
+"Copy the link directly from the app's share menu for the most reliable results.",
+"Make sure the video is public — private and restricted posts can't be fetched.",
+"On mobile, downloaded files usually appear in your Downloads folder or gallery.",
+"For music and podcasts, choose the 'Audio only' option to save an MP3 or M4A.",
 ];
 
 const fixes = [
-  "Double-check the link is complete and hasn't been shortened or cut off.",
-  "Re-copy the link from the original app rather than a forwarded message.",
-  "Confirm the content isn't private, age-restricted, region-locked, or deleted.",
-  "Refresh the page and try again — source platforms occasionally change formats.",
+"Double-check the link is complete and hasn't been shortened or cut off.",
+"Re-copy the link from the original app rather than a forwarded message.",
+"Confirm the content isn't private, age-restricted, region-locked, or deleted.",
+"Refresh the page and try again — source platforms occasionally change formats.",
 ];
 
 function HowTo() {

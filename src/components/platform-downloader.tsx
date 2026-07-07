@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Download, Loader2, Music, Video, LinkIcon, AlertCircle, Clapperboard, Check } from "lucide-react";
+import { Download, Loader2, LinkIcon, AlertCircle, Clapperboard, Check, ClipboardPaste } from "lucide-react";
 import type { Platform } from "@/lib/platforms";
 import { PlatformIcon } from "@/lib/platform-icons";
 import { fetchDownload, type MediaInfo } from "@/lib/download";
@@ -81,8 +81,15 @@ export function PlatformDownloader({
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string>("");
   const [media, setMedia] = useState<MediaInfo | null>(null);
-  const [tab, setTab] = useState<"video" | "audio">("video");
-  const [selected, setSelected] = useState(0);
+
+  async function handlePaste() {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text) setUrl(text.trim());
+    } catch {
+      /* clipboard unavailable — ignore */
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -102,8 +109,6 @@ export function PlatformDownloader({
       const data = await fetchDownload(value);
       if (data.success && data.mediaInfo) {
         setMedia(data.mediaInfo);
-        setTab("video");
-        setSelected(0);
         setStatus("done");
       } else {
         setError(data.message || "We couldn't find a downloadable video at that link.");
@@ -116,16 +121,17 @@ export function PlatformDownloader({
   }
 
   const formats = media ? buildFormats(media) : { video: [], audio: [] };
-  const list = tab === "video" ? formats.video : formats.audio;
-  const current = list[selected] || list[0];
+  const rows: Array<{ format: string; quality: string; note?: string; url: string }> = [
+    ...formats.video.map((f) => ({ format: "MP4", quality: f.label, note: f.note, url: f.url })),
+    ...formats.audio.map((f) => ({ format: "MP3", quality: f.label, note: f.note ?? "Audio", url: f.url })),
+  ];
   const cover = media?.thumbnail || media?.coverImage || null;
   const creator = media?.author || media?.authorName || media?.creator || null;
 
-
   return (
     <div className="mx-auto w-full max-w-2xl">
-      <form onSubmit={handleSubmit} className="group relative">
-        <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-3 shadow-elegant sm:flex-row sm:items-center sm:pl-5">
+      <form onSubmit={handleSubmit}>
+        <div className="flex flex-col gap-2 rounded-2xl border border-border bg-card p-2 shadow-soft-lg sm:flex-row sm:items-center sm:pl-4">
           <div className="flex flex-1 items-center gap-3">
             <LinkIcon className="h-5 w-5 shrink-0 text-muted-foreground" />
             <input
@@ -138,23 +144,32 @@ export function PlatformDownloader({
               aria-label={`${platform.name} link`}
             />
           </div>
-          <button
-            type="submit"
-            disabled={status === "loading" || !url.trim()}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-6 py-3 font-display text-sm font-bold text-brand-foreground transition-transform hover:scale-[1.02] active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {status === "loading" ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Download className="h-4 w-4" strokeWidth={2.5} />
-            )}
-            {status === "loading" ? "Fetching…" : "Download"}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handlePaste}
+              className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-border bg-secondary px-4 py-3 text-sm font-bold text-foreground transition-colors hover:bg-muted"
+            >
+              <ClipboardPaste className="h-4 w-4" /> Paste
+            </button>
+            <button
+              type="submit"
+              disabled={status === "loading" || !url.trim()}
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-accent px-6 py-3 font-display text-sm font-bold text-primary-foreground transition-transform hover:scale-[1.02] active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {status === "loading" ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4" strokeWidth={2.5} />
+              )}
+              {status === "loading" ? "Fetching…" : "Download"}
+            </button>
+          </div>
         </div>
       </form>
 
       <p className="mt-3 text-center text-xs text-muted-foreground">
-        Paste a {platform.name} link above. We&apos;ll pull the highest quality available.
+        Supports public videos only. Private or restricted videos may not work.
       </p>
 
       {status === "error" && (
@@ -164,8 +179,14 @@ export function PlatformDownloader({
         </div>
       )}
 
+      {/* "Your Video is Ready!" — only shown after a successful download */}
       {status === "done" && media && (
-        <div className="mt-8 overflow-hidden rounded-3xl border border-border bg-card shadow-elegant">
+        <div className="mt-8 overflow-hidden rounded-2xl border border-border bg-card text-left shadow-soft-lg">
+          <div className="flex items-center gap-2 border-b border-border bg-primary/5 px-5 py-3">
+            <Check className="h-5 w-5 text-primary" />
+            <h3 className="font-display text-lg font-bold">Your Video is Ready!</h3>
+          </div>
+
           <div className="flex flex-col gap-5 p-5 sm:flex-row">
             <div className="relative aspect-video w-full shrink-0 overflow-hidden rounded-2xl bg-secondary sm:w-56">
               {cover ? (
@@ -183,81 +204,53 @@ export function PlatformDownloader({
               )}
             </div>
 
-            <div className="flex min-w-0 flex-1 flex-col">
+            <div className="min-w-0 flex-1">
               <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-brand/15 px-2.5 py-1 text-xs font-semibold text-brand">
                 <PlatformIcon slug={platform.slug} className="h-3.5 w-3.5" /> {media.platform || platform.name}
               </span>
-              <h3 className="mt-2 line-clamp-2 text-lg font-bold leading-snug">
+              <h4 className="mt-2 line-clamp-2 text-lg font-bold leading-snug">
                 {media.title || "Your download is ready"}
-              </h3>
-              {creator && (
-                <p className="mt-1 text-sm text-muted-foreground">by {creator}</p>
-              )}
-
-              {/* Format tabs */}
-              <div className="mt-4 inline-flex rounded-xl border border-border bg-background/50 p-1">
-                <button
-                  type="button"
-                  onClick={() => { setTab("video"); setSelected(0); }}
-                  disabled={formats.video.length === 0}
-                  className={`inline-flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-sm font-semibold transition-colors disabled:opacity-40 ${
-                    tab === "video" ? "bg-brand text-brand-foreground" : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  <Video className="h-4 w-4" /> Video (MP4)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { setTab("audio"); setSelected(0); }}
-                  disabled={formats.audio.length === 0}
-                  className={`inline-flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-sm font-semibold transition-colors disabled:opacity-40 ${
-                    tab === "audio" ? "bg-brand text-brand-foreground" : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  <Music className="h-4 w-4" /> Audio (MP3)
-                </button>
-              </div>
+              </h4>
+              {creator && <p className="mt-1 text-sm text-muted-foreground">by {creator}</p>}
+              <p className="mt-1 text-sm text-muted-foreground">Your video is ready to download.</p>
             </div>
           </div>
 
-          {/* Quality selector */}
-          {list.length > 0 && (
-            <div className="border-t border-border bg-background/40 px-5 py-4">
-              <p className="mb-2.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                Choose quality
+          {/* Format table */}
+          {rows.length > 0 && (
+            <div className="overflow-x-auto border-t border-border">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-secondary/60 text-left text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                    <th className="px-5 py-3">Format</th>
+                    <th className="px-5 py-3">Quality</th>
+                    <th className="px-5 py-3">Type</th>
+                    <th className="px-5 py-3 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {rows.map((r, i) => (
+                    <tr key={`${r.format}-${r.quality}-${i}`}>
+                      <td className="px-5 py-3 font-bold">{r.format}</td>
+                      <td className="px-5 py-3">{r.quality}</td>
+                      <td className="px-5 py-3 text-muted-foreground">{r.note || "—"}</td>
+                      <td className="px-5 py-3 text-right">
+                        <a
+                          href={r.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-primary to-accent px-4 py-2 text-xs font-bold text-primary-foreground transition-transform hover:scale-[1.03] active:scale-95"
+                        >
+                          <Download className="h-3.5 w-3.5" strokeWidth={2.5} /> Download
+                        </a>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p className="px-5 py-3 text-xs text-muted-foreground">
+                Available formats depend on the original video.
               </p>
-              <div className="flex flex-wrap gap-2">
-                {list.map((f, i) => (
-                  <button
-                    key={`${f.label}-${i}`}
-                    type="button"
-                    onClick={() => setSelected(i)}
-                    className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${
-                      selected === i
-                        ? "border-brand bg-brand/10 text-brand"
-                        : "border-border bg-card hover:border-brand/50"
-                    }`}
-                  >
-                    {selected === i && <Check className="h-3.5 w-3.5" />}
-                    {f.label}
-                    {f.note && (
-                      <span className="text-[11px] font-normal text-muted-foreground">· {f.note}</span>
-                    )}
-                  </button>
-                ))}
-              </div>
-
-              {current && (
-                <a
-                  href={current.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand px-5 py-3 font-display text-sm font-bold text-brand-foreground transition-transform hover:scale-[1.01] active:scale-95 sm:w-auto"
-                >
-                  <Download className="h-4 w-4" strokeWidth={2.5} />
-                  Download {tab === "video" ? "MP4" : "MP3"} · {current.label}
-                </a>
-              )}
             </div>
           )}
         </div>
@@ -265,3 +258,4 @@ export function PlatformDownloader({
     </div>
   );
 }
+
