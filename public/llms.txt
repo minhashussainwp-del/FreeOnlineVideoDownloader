@@ -1,0 +1,20 @@
+# Free Online Video Downloader
+
+> A fast, free, browser-based tool to download public videos and audio from 11+ platforms — YouTube, TikTok, Instagram, Facebook, Twitter/X and more — with no sign-up, apps, or extensions.
+
+Free Online Video Downloader lets anyone paste a public video link and save the video or audio in the highest available quality. It works on any phone, tablet, or computer directly in the browser, with no accounts and no stored links or files.
+
+## Pages
+
+- [Home](/): Paste a link to download public videos and audio from all supported platforms.
+- [How to Download](/how-to-download): Step-by-step guide, pro tips, and fixes for downloading videos.
+- [Blog](/blog): Guides, tips, and tutorials on downloading videos and audio.
+- [About](/about): Who we are, our mission, and the platforms we support.
+- [FAQ](/faq): Answers about quality, cost, safety, and supported platforms.
+- [Contact](/contact): Reach the team for support, feedback, or copyright concerns.
+
+## Optional
+
+- [Privacy Policy](/privacy): How we handle your data.
+- [Terms of Service](/terms): Acceptable use and disclaimers.
+- [DMCA](/dmca): Copyright and takedown information.

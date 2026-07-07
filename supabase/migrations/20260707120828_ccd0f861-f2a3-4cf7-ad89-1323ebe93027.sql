@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.mark_post_needs_seo_audit() FROM PUBLIC, anon, authenticated;
