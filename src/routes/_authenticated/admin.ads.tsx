@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { getAdsAdmin, saveAd } from "@/lib/ads.functions";
 import { AD_PLACEMENTS, adMap, type AdPlacement, type AdRow } from "@/lib/ads";
 import { SITE_DATA_QUERY_KEY } from "@/lib/use-site-data";
+import { AiAssist } from "@/components/ai-writer/ai-assist";
 
 export const Route = createFileRoute("/_authenticated/admin/ads")({
   component: AdminAds,
@@ -148,7 +149,16 @@ function AdminAds() {
                     </div>
                   ) : (
                     <div className="space-y-1.5">
-                      <label className="text-sm font-semibold">Ad code (HTML / JavaScript)</label>
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-semibold">Ad code (HTML / JavaScript)</label>
+                        <AiAssist
+                          fieldKind="ad_copy"
+                          value={d.code}
+                          onApply={(t) => update(placement, { code: t })}
+                          context={`Ad slot "${label}" (${description}) on a free video downloader website. Generate a clean, self-contained HTML ad banner snippet with inline styles and persuasive copy.`}
+                          label="ad copy / banner"
+                        />
+                      </div>
                       <textarea
                         value={d.code}
                         onChange={(e) => update(placement, { code: e.target.value })}

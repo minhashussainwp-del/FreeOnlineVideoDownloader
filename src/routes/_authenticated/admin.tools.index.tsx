@@ -11,6 +11,7 @@ import { listPlatformContentAdmin } from "@/lib/platform-content.functions";
 import { listToolSettingsAdmin, saveToolSetting } from "@/lib/site-content.functions";
 import { toolSettingMap, type ToolSettingMap } from "@/lib/site-content";
 import { SITE_DATA_QUERY_KEY } from "@/lib/use-site-data";
+import { AiAssist } from "@/components/ai-writer/ai-assist";
 
 export const Route = createFileRoute("/_authenticated/admin/tools/")({
   component: AdminTools,
@@ -136,7 +137,16 @@ function ToolCard({
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <div>
-          <label className="mb-1 block text-xs font-semibold text-muted-foreground">Name</label>
+          <div className="mb-1 flex items-center justify-between">
+            <label className="block text-xs font-semibold text-muted-foreground">Name</label>
+            <AiAssist
+              fieldKind="name"
+              value={name}
+              onApply={setName}
+              context={`Downloader tool page for ${platform.name}. ${platform.tagline}`}
+              label="tool name"
+            />
+          </div>
           <input
             value={name}
             placeholder={platform.name}
@@ -145,7 +155,16 @@ function ToolCard({
           />
         </div>
         <div>
-          <label className="mb-1 block text-xs font-semibold text-muted-foreground">Tagline</label>
+          <div className="mb-1 flex items-center justify-between">
+            <label className="block text-xs font-semibold text-muted-foreground">Tagline</label>
+            <AiAssist
+              fieldKind="tagline"
+              value={tagline}
+              onApply={setTagline}
+              context={`Downloader tool page for ${platform.name}. ${platform.description}`}
+              label="tagline"
+            />
+          </div>
           <input
             value={tagline}
             placeholder={platform.tagline}
@@ -154,9 +173,18 @@ function ToolCard({
           />
         </div>
         <div className="sm:col-span-2">
-          <label className="mb-1 block text-xs font-semibold text-muted-foreground">
-            Short description (homepage card)
-          </label>
+          <div className="mb-1 flex items-center justify-between">
+            <label className="block text-xs font-semibold text-muted-foreground">
+              Short description (homepage card)
+            </label>
+            <AiAssist
+              fieldKind="description"
+              value={description}
+              onApply={setDescription}
+              context={`Downloader tool page for ${platform.name}. ${platform.tagline}`}
+              label="description"
+            />
+          </div>
           <textarea
             rows={2}
             value={description}

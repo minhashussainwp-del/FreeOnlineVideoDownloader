@@ -16,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { savePost } from "@/lib/blog.functions";
 import { slugify, excerptFromHtml } from "@/lib/blog-utils";
 import { RichTextEditor } from "@/components/rich-text-editor";
+import { AiAssist } from "@/components/ai-writer/ai-assist";
 
 type PostRow = {
   id: string;
@@ -175,6 +176,16 @@ export function PostEditor({ post }: { post?: PostRow | null }) {
   const seoDesc = metaDescription || excerpt || excerptFromHtml(content) || "Your meta description preview will appear here.";
   const seoUrl = `yourdomain.com › blog › ${slug || "post-slug"}`;
 
+  const aiContext = [
+    "This is a blog post for a free online video downloader website.",
+    title ? `Post title: ${title}` : "",
+    category ? `Category: ${category}` : "",
+    tags ? `Tags: ${tags}` : "",
+    excerpt ? `Excerpt: ${excerpt}` : "",
+  ]
+    .filter(Boolean)
+    .join("\n");
+
   return (
     <form
       onSubmit={(e) => {
@@ -185,7 +196,19 @@ export function PostEditor({ post }: { post?: PostRow | null }) {
     >
       {/* Main column */}
       <div className="space-y-5">
-        <Field label="Title" id="post-title">
+        <Field
+          label="Title"
+          id="post-title"
+          hint={
+            <AiAssist
+              fieldKind="title"
+              value={title}
+              onApply={onTitle}
+              context={aiContext}
+              label="post title"
+            />
+          }
+        >
           <input
             className={`${inputCls} font-display text-lg`}
             value={title}
@@ -195,7 +218,19 @@ export function PostEditor({ post }: { post?: PostRow | null }) {
           />
         </Field>
 
-        <Field label="Excerpt" id="post-excerpt" hint="Short summary shown in the blog list">
+        <Field
+          label="Excerpt"
+          id="post-excerpt"
+          hint={
+            <AiAssist
+              fieldKind="excerpt"
+              value={excerpt}
+              onApply={setExcerpt}
+              context={aiContext}
+              label="excerpt"
+            />
+          }
+        >
           <textarea
             className={`${inputCls} min-h-[80px] resize-y`}
             value={excerpt}
@@ -205,7 +240,16 @@ export function PostEditor({ post }: { post?: PostRow | null }) {
         </Field>
 
         <div id="post-content" className="scroll-mt-24 space-y-1.5 rounded-xl transition-shadow">
-          <span className="text-sm font-semibold text-foreground">Content</span>
+          <span className="flex items-center justify-between">
+            <span className="text-sm font-semibold text-foreground">Content</span>
+            <AiAssist
+              fieldKind="article"
+              value={content}
+              onApply={setContent}
+              context={aiContext}
+              label="article body (HTML)"
+            />
+          </span>
           <RichTextEditor value={content} onChange={setContent} onImageUpload={uploadImage} />
         </div>
 
@@ -234,8 +278,17 @@ export function PostEditor({ post }: { post?: PostRow | null }) {
               label="Meta title"
               id="seo-meta-title"
               hint={
-                <span className={counterColor(metaTitle.length, 15, 60)}>
-                  {metaTitle.length}/60
+                <span className="flex items-center gap-2">
+                  <span className={counterColor(metaTitle.length, 15, 60)}>
+                    {metaTitle.length}/60
+                  </span>
+                  <AiAssist
+                    fieldKind="meta_title"
+                    value={metaTitle}
+                    onApply={setMetaTitle}
+                    context={aiContext}
+                    label="meta title"
+                  />
                 </span>
               }
             >
@@ -250,8 +303,17 @@ export function PostEditor({ post }: { post?: PostRow | null }) {
               label="Meta description"
               id="seo-meta-description"
               hint={
-                <span className={counterColor(metaDescription.length, 70, 160)}>
-                  {metaDescription.length}/160
+                <span className="flex items-center gap-2">
+                  <span className={counterColor(metaDescription.length, 70, 160)}>
+                    {metaDescription.length}/160
+                  </span>
+                  <AiAssist
+                    fieldKind="meta_description"
+                    value={metaDescription}
+                    onApply={setMetaDescription}
+                    context={aiContext}
+                    label="meta description"
+                  />
                 </span>
               }
             >

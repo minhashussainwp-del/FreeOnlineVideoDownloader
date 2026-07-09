@@ -326,5 +326,152 @@ export const publishFromAi = createServerFn({ method: "POST" })
     return { ok: true, target: "new_post", id: created?.id, slug: created?.slug };
   });
 
+// ============= Inline AI writing assistant =============
+// A one-shot text generator/editor used by the small "AI" buttons that sit
+// next to individual fields across the admin dashboard (tool pages, post
+// pages, ad copy, SEO). Admin-only. Uses the admin's own configured provider
+// (default enabled row in ai_providers); falls back to Lovable AI otherwise.
+
+type AssistFieldKind =
+  | "name"
+  | "tagline"
+  | "description"
+  | "title"
+  | "excerpt"
+  | "meta_title"
+  | "meta_description"
+  | "article"
+  | "ad_copy"
+  | "text";
+
+const FIELD_GUIDANCE: Record<AssistFieldKind, string> = {
+  name: "a short, catchy product/tool name (2-4 words, no quotes, Title Case).",
+  tagline: "a punchy one-line tagline (max ~12 words, no period at the end, no quotes).",
+  description: "a clear, benefit-driven description of 1-3 sentences.",
+  title: "an engaging, specific title (max ~70 characters, no quotes).",
+  excerpt: "a compelling 1-2 sentence summary/teaser (max ~300 characters).",
+  meta_title: "an SEO meta title, 50-60 characters, keyword-rich and compelling (no quotes).",
+  meta_description:
+    "an SEO meta description, 150-160 characters, keyword-rich and compelling, describing the page value (no quotes).",
+  article:
+    "a well-structured article body. Use clean semantic HTML (<h2>, <h3>, <p>, <ul>, <li>, <strong>) — no <html>/<head>/<body> wrappers, no markdown fences.",
+  ad_copy: "short, persuasive advertising copy that drives clicks.",
+  text: "clear, high-quality copy for this field.",
+};
+
+const assistInput = z.object({
+  fieldKind: z.enum([
+    "name",
+    "tagline",
+    "description",
+    "title",
+    "excerpt",
+    "meta_title",
+    "meta_description",
+    "article",
+    "ad_copy",
+    "text",
+  ]),
+  mode: z.enum(["generate", "improve", "shorten", "expand", "fix", "custom"]).default("generate"),
+  current: z.string().max(20000).optional().default(""),
+  instruction: z.string().max(2000).optional().default(""),
+  context: z.string().max(4000).optional().default(""),
+  providerId: z.string().uuid().optional(),
+});
+
+function buildAssistPrompt(d: z.infer<typeof assistInput>): string {
+  const guidance = FIELD_GUIDANCE[d.fieldKind as AssistFieldKind];
+  const modeLine =
+    d.mode === "improve"
+      ? "Rewrite and improve the existing text below, keeping its intent but making it clearer, more engaging and higher quality."
+      : d.mode === "shorten"
+        ? "Make the existing text below shorter and tighter while keeping the key meaning."
+        : d.mode === "expand"
+          ? "Expand the existing text below with more useful, specific detail."
+          : d.mode === "fix"
+            ? "Fix grammar, spelling and clarity issues in the existing text below without changing its meaning."
+            : d.mode === "custom"
+              ? "Produce the field content following the extra instruction."
+              : "Generate fresh, high-quality content for this field.";
+
+  return [
+    `You are writing ${guidance}`,
+    d.context ? `\nContext about the page/tool:\n${d.context}` : "",
+    d.current ? `\nExisting text:\n"""${d.current}"""` : "",
+    d.instruction ? `\nExtra instruction from the admin:\n${d.instruction}` : "",
+    `\nTask: ${modeLine}`,
+    `\nReturn ONLY the final field content with no preamble, no explanations, no surrounding quotes${
+      d.fieldKind === "article" ? "" : ", and no markdown formatting"
+    }.`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+export const assistWrite = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => assistInput.parse(d))
+  .handler(async ({ data, context }): Promise<{ text: string }> => {
+    await assertAdmin(context);
+
+    const { generateText } = await import("ai");
+    const { createOpenAICompatible } = await import("@ai-sdk/openai-compatible");
+
+    // Prefer the admin's configured provider; fall back to Lovable AI.
+    let providerQuery = context.supabase
+      .from("ai_providers")
+      .select("id, base_url, model, api_key, enabled, is_default")
+      .eq("enabled", true);
+    if (data.providerId) providerQuery = providerQuery.eq("id", data.providerId);
+    const { data: providers } = await providerQuery;
+    const provider =
+      (providers ?? []).find((p) => p.is_default) ?? (providers ?? [])[0] ?? null;
+
+    let model;
+    if (provider) {
+      const gateway = createOpenAICompatible({
+        name: "user-provider",
+        baseURL: provider.base_url,
+        headers: { Authorization: `Bearer ${provider.api_key}` },
+      });
+      model = gateway(provider.model);
+    } else {
+      const lovableKey = process.env.LOVABLE_API_KEY;
+      if (!lovableKey) {
+        throw new Error(
+          "No AI provider configured. Add one under AI Writer → Providers, or enable Lovable AI.",
+        );
+      }
+      const gateway = createOpenAICompatible({
+        name: "lovable",
+        baseURL: "https://ai.gateway.lovable.dev/v1",
+        headers: {
+          "Lovable-API-Key": lovableKey,
+          "X-Lovable-AIG-SDK": "vercel-ai-sdk",
+        },
+      });
+      model = gateway("openai/gpt-5.5");
+    }
+
+    const { text } = await generateText({
+      model,
+      system:
+        "You are an expert copywriter and SEO specialist working inside a website's admin dashboard. You write concise, high-quality, publish-ready copy.",
+      prompt: buildAssistPrompt(data),
+    });
+
+    // Clean up common wrapping artefacts.
+    let out = (text ?? "").trim();
+    out = out.replace(/^```[a-z]*\n?/i, "").replace(/```$/i, "").trim();
+    if (
+      data.fieldKind !== "article" &&
+      out.length > 1 &&
+      ((out.startsWith('"') && out.endsWith('"')) || (out.startsWith("'") && out.endsWith("'")))
+    ) {
+      out = out.slice(1, -1).trim();
+    }
+    return { text: out };
+  });
+
 // PROVIDER_TYPES export kept for potential future validation reuse
 export const _providerTypes = PROVIDER_TYPES;

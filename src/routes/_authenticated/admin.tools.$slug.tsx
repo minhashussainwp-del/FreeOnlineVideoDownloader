@@ -11,6 +11,7 @@ import {
   savePlatformContent,
   generatePlatformContent,
 } from "@/lib/platform-content.functions";
+import { AiAssist } from "@/components/ai-writer/ai-assist";
 
 export const Route = createFileRoute("/_authenticated/admin/tools/$slug")({
   component: AdminToolEditor,
@@ -20,10 +21,21 @@ const inputCls =
 "w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary";
 const labelCls = "text-sm font-semibold text-foreground";
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  children,
+  action,
+}: {
+  label: string;
+  children: React.ReactNode;
+  action?: React.ReactNode;
+}) {
   return (
     <div className="space-y-1.5">
-      <label className={labelCls}>{label}</label>
+      <div className="flex items-center justify-between">
+        <label className={labelCls}>{label}</label>
+        {action}
+      </div>
       {children}
     </div>
   );
@@ -148,7 +160,18 @@ function AdminToolEditor() {
             </Field>
           </div>
 
-          <Field label="Quick answer (AEO)">
+          <Field
+            label="Quick answer (AEO)"
+            action={
+              <AiAssist
+                fieldKind="description"
+                value={article.answer}
+                onApply={(t) => update("answer", t)}
+                context={`${platform.name} downloader tool page. Quick answer for the "how do I download" question.`}
+                label="quick answer"
+              />
+            }
+          >
             <textarea className={inputCls} rows={2} value={article.answer} onChange={(e) => update("answer", e.target.value)} />
           </Field>
 
@@ -180,7 +203,18 @@ function AdminToolEditor() {
             <LinesField label="PC / Mac steps" value={article.pcSteps} onChange={(v) => update("pcSteps", v)} rows={4} />
           </div>
 
-          <Field label="Formats & quality">
+          <Field
+            label="Formats & quality"
+            action={
+              <AiAssist
+                fieldKind="description"
+                value={article.formats}
+                onApply={(t) => update("formats", t)}
+                context={`${platform.name} downloader tool page. Describe supported formats and quality options.`}
+                label="formats & quality"
+              />
+            }
+          >
             <textarea className={inputCls} rows={3} value={article.formats} onChange={(e) => update("formats", e.target.value)} />
           </Field>
 
@@ -194,7 +228,18 @@ function AdminToolEditor() {
             onChange={(v) => update("comparison", v)}
           />
 
-          <Field label="Alternatives">
+          <Field
+            label="Alternatives"
+            action={
+              <AiAssist
+                fieldKind="description"
+                value={article.alternatives}
+                onApply={(t) => update("alternatives", t)}
+                context={`${platform.name} downloader tool page. Describe alternative tools or methods.`}
+                label="alternatives"
+              />
+            }
+          >
             <textarea className={inputCls} rows={3} value={article.alternatives} onChange={(e) => update("alternatives", e.target.value)} />
           </Field>
 
